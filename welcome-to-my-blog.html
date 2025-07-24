@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>블로그에 오신 것을 환영합니다! - My Simple Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+    <style>
+        .prose {
+            max-width: none;
+        }
+        .prose h1 { @apply text-3xl font-bold text-gray-900 mt-8 mb-4; }
+        .prose h2 { @apply text-2xl font-semibold text-gray-900 mt-6 mb-3; }
+        .prose h3 { @apply text-xl font-semibold text-gray-900 mt-5 mb-2; }
+        .prose p { @apply text-gray-700 mb-4 leading-relaxed; }
+        .prose ul { @apply list-disc list-inside mb-4 text-gray-700; }
+        .prose ol { @apply list-decimal list-inside mb-4 text-gray-700; }
+        .prose li { @apply mb-1; }
+        .prose blockquote { @apply border-l-4 border-blue-500 pl-4 italic text-gray-600 mb-4; }
+        .prose code { @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono; }
+        .prose pre { @apply bg-gray-800 text-white p-4 rounded-lg mb-4 overflow-x-auto; }
+        .prose pre code { @apply bg-transparent p-0; }
+        .prose a { @apply text-blue-600 hover:text-blue-800 underline; }
+        .prose strong { @apply font-semibold; }
+        .prose em { @apply italic; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-6">
+                <nav class="mb-4">
+                    <a href="index.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        ← 블로그 홈으로
+                    </a>
+                </nav>
+                <h1 class="text-3xl font-bold text-gray-900">My Simple Blog</h1>
+                <p class="mt-2 text-gray-600">간단한 CMS로 만든 블로그</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <article class="bg-white rounded-lg shadow-sm border p-8">
+            <header class="mb-8">
+                <div class="flex items-center space-x-2 mb-4">
+                    
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                        공지사항
+                    </span>
+                    
+                    <time class="text-sm text-gray-500">2024-01-15</time>
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">블로그에 오신 것을 환영합니다!</h1>
+            </header>
+            
+            <div class="prose prose-lg max-w-none">
+                <h1>안녕하세요! 👋</h1>
+<p><strong>My Simple CMS</strong>로 만든 블로그에 오신 것을 환영합니다!</p>
+<h2>이 블로그의 특징</h2>
+<p>이 블로그는 다음과 같은 기능을 제공합니다:</p>
+<ul>
+<li>✍️ <strong>마크다운으로 글 작성</strong>: 간편하고 직관적인 마크다운 문법 사용</li>
+<li>👀 <strong>실시간 미리보기</strong>: 작성하면서 바로 결과를 확인</li>
+<li>🎨 <strong>깔끔한 디자인</strong>: Tailwind CSS로 만든 모던한 UI</li>
+<li>🚀 <strong>GitHub Pages 배포</strong>: 원클릭으로 블로그 배포</li>
+</ul>
+<h2>코드 예제</h2>
+<p>Python 코드도 예쁘게 하이라이팅됩니다:</p>
+<pre class="codehilite"><code class="language-python">def hello_world():
+    print(&quot;Hello, World!&quot;)
+    return &quot;Welcome to my blog!&quot;
+
+# 함수 호출
+message = hello_world()
+</code></pre>
+
+<h2>목록도 지원합니다</h2>
+<h3>할 일 목록</h3>
+<ul>
+<li>[x] CMS 개발 완료</li>
+<li>[x] 템플릿 디자인</li>
+<li>[ ] 더 많은 기능 추가</li>
+<li>[ ] 댓글 시스템 구현</li>
+</ul>
+<h3>일반 목록</h3>
+<ol>
+<li>첫 번째 항목</li>
+<li>두 번째 항목</li>
+<li>세 번째 항목</li>
+</ol>
+<h2>인용문</h2>
+<blockquote>
+<p>"좋은 소프트웨어는 사용자가 필요로 하는 것을 정확히 제공한다."</p>
+<p>— 개발자의 명언</p>
+</blockquote>
+<hr />
+<p>앞으로 이 블로그를 통해 다양한 내용을 공유하겠습니다. 많은 관심 부탁드립니다!</p>
+            </div>
+        </article>
+
+        <div class="mt-8 text-center">
+            <a href="index.html" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                ← 블로그 홈으로 돌아가기
+            </a>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                © 2024 My Simple Blog. GitHub Pages로 호스팅됩니다.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html> 
