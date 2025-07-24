@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if post %}글 수정{% else %}새 글 작성{% endif %} - My Simple CMS
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">
+            {% if post %}글 수정{% else %}새 글 작성{% endif %}
+        </h1>
+        <p class="mt-2 text-sm text-gray-700">마크다운으로 글을 작성하고 실시간으로 미리보기를 확인할 수 있습니다.</p>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700">제목</label>
+                <input type="text" name="title" id="title" required
+                       value="{{ post.title if post else '' }}"
+                       class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            <div>
+                <label for="date" class="block text-sm font-medium text-gray-700">작성일</label>
+                <input type="date" name="date" id="date" required
+                       value="{{ post.date if post else '' }}"
+                       class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+        </div>
+
+        <div>
+            <label for="category" class="block text-sm font-medium text-gray-700">카테고리</label>
+            <input type="text" name="category" id="category"
+                   value="{{ post.category if post else '' }}"
+                   placeholder="예: 기술, 일상, 리뷰"
+                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <label for="content" class="block text-sm font-medium text-gray-700 mb-2">내용 (마크다운)</label>
+                <textarea name="content" id="markdown-input" rows="20" required
+                          class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 font-mono"
+                          placeholder="# 제목
+
+여기에 마크다운으로 내용을 작성하세요.
+
+## 부제목
+
+- 목록 항목 1
+- 목록 항목 2
+
+```python
+print('Hello, World!')
+```">{{ post.content if post else '' }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">미리보기</label>
+                <div id="preview-output" class="border border-gray-300 rounded-md p-4 bg-white min-h-96 prose prose-sm max-w-none">
+                    <p class="text-gray-500 italic">내용을 입력하면 미리보기가 여기에 표시됩니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between">
+            <a href="{{ url_for('posts_list') }}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                취소
+            </a>
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                {% if post %}수정 완료{% else %}저장{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let previewTimeout;
+const markdownInput = document.getElementById('markdown-input');
+const previewOutput = document.getElementById('preview-output');
+
+// 페이지 로드 시 초기 미리보기 생성
+if (markdownInput.value.trim()) {
+    updatePreview();
+}
+
+// 현재 날짜를 기본값으로 설정 (새 글 작성 시)
+{% if not post %}
+document.getElementById('date').value = new Date().toISOString().split('T')[0];
+{% endif %}
+
+markdownInput.addEventListener('input', function() {
+    clearTimeout(previewTimeout);
+    previewTimeout = setTimeout(updatePreview, 500); // 500ms 지연
+});
+
+function updatePreview() {
+    const content = markdownInput.value;
+    
+    if (!content.trim()) {
+        previewOutput.innerHTML = '<p class="text-gray-500 italic">내용을 입력하면 미리보기가 여기에 표시됩니다.</p>';
+        return;
+    }
+
+    fetch('/preview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: content })
+    })
+    .then(response => response.json())
+    .then(data => {
+        previewOutput.innerHTML = data.html;
+        // Prism.js로 코드 하이라이팅 다시 적용
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAllUnder(previewOutput);
+        }
+    })
+    .catch(error => {
+        console.error('미리보기 오류:', error);
+        previewOutput.innerHTML = '<p class="text-red-500">미리보기를 불러오는 중 오류가 발생했습니다.</p>';
+    });
+}
+</script>
+{% endblock %} 

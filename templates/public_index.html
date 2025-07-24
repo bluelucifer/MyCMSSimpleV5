@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-6">
+                <h1 class="text-3xl font-bold text-gray-900">My Simple Blog</h1>
+                <p class="mt-2 text-gray-600">간단한 CMS로 만든 블로그</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {% if posts %}
+        <div class="space-y-8">
+            {% for post in posts %}
+            <article class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        {% if post.category %}
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {{ post.category }}
+                        </span>
+                        {% endif %}
+                        <time class="text-sm text-gray-500">{{ post.date }}</time>
+                    </div>
+                </div>
+                
+                <h2 class="text-xl font-semibold text-gray-900 mb-3">
+                    <a href="{{ post.slug }}.html" class="hover:text-blue-600 transition-colors">
+                        {{ post.title }}
+                    </a>
+                </h2>
+                
+                <div class="text-gray-600 line-clamp-3">
+                    {{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ post.slug }}.html" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        더 읽기 →
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">아직 글이 없습니다</h3>
+            <p class="mt-1 text-sm text-gray-500">첫 번째 글이 게시되면 여기에 표시됩니다.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                © 2024 My Simple Blog. GitHub Pages로 호스팅됩니다.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html> 
