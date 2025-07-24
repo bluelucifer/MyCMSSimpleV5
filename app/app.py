@@ -83,11 +83,38 @@ def publish():
         # 사이트 빌드
         build_site()
         
+        # gh-pages 브랜치로 전환
+        run_git_command(['git', 'checkout', 'gh-pages'])
+        
+        # _site 내용을 루트로 복사
+        import shutil
+        import os
+        site_dir = app.config['SITE_DIR']
+        
+        # 기존 파일들 삭제 (Git 관련 파일 제외)
+        for item in os.listdir('.'):
+            if item not in ['.git', '.gitignore', '_site']:
+                if os.path.isdir(item):
+                    shutil.rmtree(item)
+                else:
+                    os.remove(item)
+        
+        # _site 내용을 루트로 복사
+        for item in os.listdir(site_dir):
+            src = os.path.join(site_dir, item)
+            if os.path.isdir(src):
+                shutil.copytree(src, item)
+            else:
+                shutil.copy2(src, item)
+        
         # Git 명령 실행
         run_git_command(['git', 'add', '.'])
         commit_message = f"Blog update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         run_git_command(['git', 'commit', '-m', commit_message])
         run_git_command(['git', 'push', 'origin', 'gh-pages'])
+        
+        # master 브랜치로 돌아가기
+        run_git_command(['git', 'checkout', 'master'])
         
         message = "배포가 성공적으로 완료되었습니다!"
         
