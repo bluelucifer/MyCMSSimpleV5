@@ -1,0 +1,9 @@
+{
+  "blog_title": "My Simple Blog",
+  "author_name": "블로거",
+  "blog_description": "간단한 CMS로 만든 블로그",
+  "posts_per_page": 10,
+  "github_username": "",
+  "twitter_username": "",
+  "email": ""
+} 

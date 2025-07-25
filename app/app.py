@@ -5,7 +5,7 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from app.post_parser import get_all_posts, get_post_by_slug, save_post, delete_post
 from app.builder import build_site
-from app.utils import run_git_command, get_all_pages, get_page_by_slug, save_page, delete_page
+from app.utils import run_git_command, get_all_pages, get_page_by_slug, save_page, delete_page, load_config, save_config
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
@@ -25,6 +25,11 @@ def allowed_file(filename):
 
 # 이미지 업로드 폴더 생성
 os.makedirs(app.config['IMAGE_UPLOAD_FOLDER'], exist_ok=True)
+
+# 전역 설정을 모든 템플릿에서 사용할 수 있도록 context processor 추가
+@app.context_processor
+def inject_config():
+    return dict(config=load_config())
 
 @app.route('/')
 def index():
@@ -173,6 +178,29 @@ def delete_page_route(slug):
     """페이지 삭제"""
     success = delete_page(slug)
     return redirect(url_for('pages_list'))
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    """사이트 설정 관리"""
+    if request.method == 'POST':
+        config = {
+            'blog_title': request.form.get('blog_title', ''),
+            'author_name': request.form.get('author_name', ''),
+            'blog_description': request.form.get('blog_description', ''),
+            'posts_per_page': int(request.form.get('posts_per_page', 10)),
+            'github_username': request.form.get('github_username', ''),
+            'twitter_username': request.form.get('twitter_username', ''),
+            'email': request.form.get('email', '')
+        }
+        
+        success = save_config(config)
+        if success:
+            return render_template('settings.html', config=config, message="설정이 성공적으로 저장되었습니다.")
+        else:
+            return render_template('settings.html', config=config, error="설정 저장 중 오류가 발생했습니다.")
+    
+    config = load_config()
+    return render_template('settings.html', config=config)
 
 @app.route('/publish', methods=['GET', 'POST'])
 def publish():
