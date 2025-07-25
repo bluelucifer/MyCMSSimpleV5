@@ -32,9 +32,10 @@ def new_post():
         content = request.form.get('content')
         date = request.form.get('date', datetime.now().strftime('%Y-%m-%d'))
         category = request.form.get('category', '')
+        tags = request.form.get('tags', '')
         
         if title and content:
-            success = save_post(None, title, content, date, category)
+            success = save_post(None, title, content, date, category, tags)
             if success:
                 return redirect(url_for('posts_list'))
         
@@ -48,9 +49,10 @@ def edit_post(slug):
         content = request.form.get('content')
         date = request.form.get('date')
         category = request.form.get('category', '')
+        tags = request.form.get('tags', '')
         
         if title and content:
-            success = save_post(slug, title, content, date, category)
+            success = save_post(slug, title, content, date, category, tags)
             if success:
                 return redirect(url_for('posts_list'))
     
