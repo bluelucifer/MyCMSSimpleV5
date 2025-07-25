@@ -2,6 +2,7 @@
 title: "블로그에 오신 것을 환영합니다!"
 date: "2024-01-15"
 category: "공지사항"
+tags: ["환영", "소개", "CMS", "블로그"]
 slug: "welcome-to-my-blog"
 ---
 

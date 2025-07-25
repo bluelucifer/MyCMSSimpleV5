@@ -16,6 +16,20 @@ def create_slug(title):
     slug = re.sub(r'[-\s]+', '-', slug)
     return slug.strip('-')
 
+def parse_tags(tags_input):
+    """태그 입력을 리스트로 변환"""
+    if not tags_input:
+        return []
+    
+    if isinstance(tags_input, list):
+        return [tag.strip() for tag in tags_input if tag.strip()]
+    
+    # 쉼표로 구분된 문자열을 리스트로 변환
+    if isinstance(tags_input, str):
+        return [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+    
+    return []
+
 def get_all_posts():
     """모든 포스트를 가져와서 날짜순으로 정렬"""
     posts = []
@@ -38,6 +52,7 @@ def get_all_posts():
                         'title': post.metadata.get('title', '제목 없음'),
                         'date': post.metadata.get('date', datetime.now().strftime('%Y-%m-%d')),
                         'category': post.metadata.get('category', ''),
+                        'tags': parse_tags(post.metadata.get('tags', [])),
                         'slug': post.metadata.get('slug', create_slug(post.metadata.get('title', filename[:-3]))),
                         'content': post.content
                     }
@@ -58,7 +73,7 @@ def get_post_by_slug(slug):
             return post
     return None
 
-def save_post(old_slug, title, content, date, category=''):
+def save_post(old_slug, title, content, date, category='', tags=''):
     """포스트 저장"""
     posts_dir = get_posts_dir()
     
@@ -90,6 +105,7 @@ def save_post(old_slug, title, content, date, category=''):
     post.metadata['title'] = title
     post.metadata['date'] = date
     post.metadata['category'] = category
+    post.metadata['tags'] = parse_tags(tags)
     post.metadata['slug'] = slug
     
     try:
@@ -117,6 +133,34 @@ def delete_post(slug):
         print(f"Error deleting post: {e}")
     
     return False
+
+def get_all_categories():
+    """모든 포스트에서 사용된 카테고리 목록 반환"""
+    posts = get_all_posts()
+    categories = set()
+    for post in posts:
+        if post.get('category'):
+            categories.add(post['category'])
+    return sorted(list(categories))
+
+def get_all_tags():
+    """모든 포스트에서 사용된 태그 목록 반환"""
+    posts = get_all_posts()
+    tags = set()
+    for post in posts:
+        if post.get('tags'):
+            tags.update(post['tags'])
+    return sorted(list(tags))
+
+def get_posts_by_category(category):
+    """특정 카테고리의 포스트들 반환"""
+    posts = get_all_posts()
+    return [post for post in posts if post.get('category') == category]
+
+def get_posts_by_tag(tag):
+    """특정 태그의 포스트들 반환"""
+    posts = get_all_posts()
+    return [post for post in posts if tag in post.get('tags', [])]
 
 def markdown_to_html(content):
     """마크다운을 HTML로 변환"""

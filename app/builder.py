@@ -1,7 +1,7 @@
 import os
 import shutil
 from jinja2 import Environment, FileSystemLoader
-from app.post_parser import get_all_posts, markdown_to_html
+from app.post_parser import get_all_posts, markdown_to_html, get_all_categories, get_all_tags, get_posts_by_category, get_posts_by_tag
 
 def get_site_dir():
     """사이트 빌드 디렉터리 경로 반환"""
@@ -64,5 +64,59 @@ def build_site():
                 
     except Exception as e:
         print(f"Error building post pages: {e}")
+    
+    # 카테고리 아카이브 페이지 생성
+    try:
+        categories = get_all_categories()
+        category_template = env.get_template('public_category_archive.html')
+        
+        # category 디렉터리 생성
+        category_dir = os.path.join(site_dir, 'category')
+        os.makedirs(category_dir, exist_ok=True)
+        
+        for category in categories:
+            category_posts = get_posts_by_category(category)
+            # 각 포스트의 마크다운을 HTML로 변환
+            for post in category_posts:
+                post['html_content'] = markdown_to_html(post['content'])
+            
+            category_html = category_template.render(category=category, posts=category_posts)
+            
+            # 카테고리 파일명을 안전하게 생성
+            safe_category = category.replace(' ', '-').replace('/', '-')
+            category_filename = f"{safe_category}.html"
+            
+            with open(os.path.join(category_dir, category_filename), 'w', encoding='utf-8') as f:
+                f.write(category_html)
+                
+    except Exception as e:
+        print(f"Error building category pages: {e}")
+    
+    # 태그 아카이브 페이지 생성
+    try:
+        tags = get_all_tags()
+        tag_template = env.get_template('public_tag_archive.html')
+        
+        # tags 디렉터리 생성
+        tags_dir = os.path.join(site_dir, 'tags')
+        os.makedirs(tags_dir, exist_ok=True)
+        
+        for tag in tags:
+            tag_posts = get_posts_by_tag(tag)
+            # 각 포스트의 마크다운을 HTML로 변환
+            for post in tag_posts:
+                post['html_content'] = markdown_to_html(post['content'])
+            
+            tag_html = tag_template.render(tag=tag, posts=tag_posts)
+            
+            # 태그 파일명을 안전하게 생성
+            safe_tag = tag.replace(' ', '-').replace('/', '-')
+            tag_filename = f"{safe_tag}.html"
+            
+            with open(os.path.join(tags_dir, tag_filename), 'w', encoding='utf-8') as f:
+                f.write(tag_html)
+                
+    except Exception as e:
+        print(f"Error building tag pages: {e}")
     
     print(f"Site built successfully in {site_dir}") 
