@@ -2,6 +2,7 @@ import os
 import shutil
 from jinja2 import Environment, FileSystemLoader
 from app.post_parser import get_all_posts, markdown_to_html, get_all_categories, get_all_tags, get_posts_by_category, get_posts_by_tag
+from app.utils import get_all_pages, page_markdown_to_html
 
 def get_site_dir():
     """사이트 빌드 디렉터리 경로 반환"""
@@ -118,5 +119,25 @@ def build_site():
                 
     except Exception as e:
         print(f"Error building tag pages: {e}")
+    
+    # 정적 페이지 생성
+    try:
+        pages = get_all_pages()
+        page_template = env.get_template('public_page.html')
+        
+        for page in pages:
+            # 마크다운을 HTML로 변환
+            page['html_content'] = page_markdown_to_html(page['content'])
+            
+            # 페이지 렌더링
+            page_html = page_template.render(page=page)
+            
+            # 파일 저장 (사이트 루트에 저장)
+            page_filename = f"{page['slug']}.html"
+            with open(os.path.join(site_dir, page_filename), 'w', encoding='utf-8') as f:
+                f.write(page_html)
+                
+    except Exception as e:
+        print(f"Error building static pages: {e}")
     
     print(f"Site built successfully in {site_dir}") 
