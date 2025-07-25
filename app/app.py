@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import json
 from datetime import datetime
+from werkzeug.utils import secure_filename
 from app.post_parser import get_all_posts, get_post_by_slug, save_post, delete_post
 from app.builder import build_site
 from app.utils import run_git_command
@@ -11,7 +12,19 @@ app = Flask(__name__, template_folder='../templates', static_folder='../static')
 # 설정
 app.config['POSTS_DIR'] = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'content', 'posts')
 app.config['SITE_DIR'] = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '_site')
+app.config['IMAGE_UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static', 'images')
 app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# 허용되는 이미지 확장자
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# 이미지 업로드 폴더 생성
+os.makedirs(app.config['IMAGE_UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
@@ -77,6 +90,45 @@ def preview():
     html = markdown.markdown(content)
     
     return jsonify({'html': html})
+
+@app.route('/upload/image', methods=['POST'])
+def upload_image():
+    """이미지 업로드"""
+    try:
+        if 'image' not in request.files:
+            return jsonify({'error': '이미지 파일이 선택되지 않았습니다.'}), 400
+        
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'error': '파일이 선택되지 않았습니다.'}), 400
+        
+        if file and allowed_file(file.filename):
+            # 안전한 파일명 생성
+            filename = secure_filename(file.filename)
+            
+            # 파일명이 중복되지 않도록 타임스탬프 추가
+            name, ext = os.path.splitext(filename)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"{name}_{timestamp}{ext}"
+            
+            # 파일 저장
+            filepath = os.path.join(app.config['IMAGE_UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            
+            # 웹에서 접근 가능한 URL 반환
+            image_url = f"/static/images/{filename}"
+            
+            return jsonify({
+                'success': True,
+                'url': image_url,
+                'filename': filename,
+                'markdown': f"![이미지 설명]({image_url})"
+            })
+        else:
+            return jsonify({'error': '허용되지 않는 파일 형식입니다. (png, jpg, jpeg, gif, webp만 허용)'}), 400
+            
+    except Exception as e:
+        return jsonify({'error': f'업로드 중 오류가 발생했습니다: {str(e)}'}), 500
 
 @app.route('/publish', methods=['GET', 'POST'])
 def publish():
