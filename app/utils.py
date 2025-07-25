@@ -4,6 +4,7 @@ import frontmatter
 import markdown
 from datetime import datetime
 import re
+import json
 
 def run_git_command(command):
     """Git 명령 실행"""
@@ -143,4 +144,52 @@ def delete_page(slug):
 
 def page_markdown_to_html(content):
     """페이지 마크다운을 HTML로 변환"""
-    return markdown.markdown(content, extensions=['codehilite', 'fenced_code']) 
+    return markdown.markdown(content, extensions=['codehilite', 'fenced_code'])
+
+def get_config_file_path():
+    """설정 파일 경로 반환"""
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.json')
+
+def load_config():
+    """설정 파일 로드"""
+    config_path = get_config_file_path()
+    
+    # 기본 설정
+    default_config = {
+        "blog_title": "My Simple Blog",
+        "author_name": "블로거",
+        "blog_description": "간단한 CMS로 만든 블로그",
+        "posts_per_page": 10,
+        "github_username": "",
+        "twitter_username": "",
+        "email": ""
+    }
+    
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                # 기본 설정과 병합 (새로운 설정 키가 추가된 경우 대비)
+                for key, value in default_config.items():
+                    if key not in config:
+                        config[key] = value
+                return config
+        else:
+            # 설정 파일이 없으면 기본 설정으로 생성
+            save_config(default_config)
+            return default_config
+    except Exception as e:
+        print(f"Error loading config: {e}")
+        return default_config
+
+def save_config(config):
+    """설정 파일 저장"""
+    config_path = get_config_file_path()
+    
+    try:
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving config: {e}")
+        return False 

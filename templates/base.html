@@ -13,12 +13,13 @@
             <div class="flex justify-between items-center py-6">
                 <div class="flex items-center">
                     <h1 class="text-2xl font-bold text-gray-900">
-                        <a href="{{ url_for('posts_list') }}" class="hover:text-blue-600">My Simple CMS</a>
+                        <a href="{{ url_for('posts_list') }}" class="hover:text-blue-600">{{ config.blog_title }}</a>
                     </h1>
                 </div>
                 <nav class="flex space-x-4">
                     <a href="{{ url_for('posts_list') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">글 목록</a>
                     <a href="{{ url_for('pages_list') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">페이지 관리</a>
+                    <a href="{{ url_for('settings') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">설정</a>
                     <a href="{{ url_for('new_post') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium">새 글 작성</a>
                 </nav>
             </div>
@@ -40,7 +41,7 @@
     <footer class="bg-white border-t mt-12">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <p class="text-center text-gray-500 text-sm">
-                © 2024 My Simple CMS. GitHub Pages로 배포됩니다.
+                © 2024 {{ config.blog_title }}. GitHub Pages로 배포됩니다.
             </p>
         </div>
     </footer>
