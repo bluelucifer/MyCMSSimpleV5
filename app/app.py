@@ -5,7 +5,7 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from app.post_parser import get_all_posts, get_post_by_slug, save_post, delete_post
 from app.builder import build_site
-from app.utils import run_git_command
+from app.utils import run_git_command, get_all_pages, get_page_by_slug, save_page, delete_page
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
@@ -129,6 +129,50 @@ def upload_image():
             
     except Exception as e:
         return jsonify({'error': f'업로드 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@app.route('/pages')
+def pages_list():
+    """페이지 목록 페이지"""
+    pages = get_all_pages()
+    return render_template('pages_list.html', pages=pages)
+
+@app.route('/pages/new', methods=['GET', 'POST'])
+def new_page():
+    """새 페이지 작성 페이지"""
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        
+        if title and content:
+            success = save_page(None, title, content)
+            if success:
+                return redirect(url_for('pages_list'))
+        
+    return render_template('page_form.html', page=None)
+
+@app.route('/pages/edit/<slug>', methods=['GET', 'POST'])
+def edit_page(slug):
+    """페이지 수정 페이지"""
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        
+        if title and content:
+            success = save_page(slug, title, content)
+            if success:
+                return redirect(url_for('pages_list'))
+    
+    page = get_page_by_slug(slug)
+    if not page:
+        return redirect(url_for('pages_list'))
+    
+    return render_template('page_form.html', page=page)
+
+@app.route('/pages/delete/<slug>', methods=['POST'])
+def delete_page_route(slug):
+    """페이지 삭제"""
+    success = delete_page(slug)
+    return redirect(url_for('pages_list'))
 
 @app.route('/publish', methods=['GET', 'POST'])
 def publish():
